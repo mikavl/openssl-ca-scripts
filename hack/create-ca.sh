@@ -20,11 +20,15 @@ umask 0077
 
 mkdir -p "$ca_directory"
 
+chmod 755 "$ca_directory"
+
 if [[ ! -f "$ca_directory/$openssl_config" ]]; then
   cp "$openssl_config.example" "$ca_directory/$openssl_config"
 fi
 
 cd "$ca_directory"
+
+chmod 644 "$openssl_config"
 
 touch "$ca_database"
 
@@ -54,6 +58,8 @@ if [[ ! -f "$ca_certificate" ]]; then
     -x509
 fi
 
+chmod 644 "$ca_certificate"
+
 if [[ ! -f "$ca_certificate_revokation_list" ]]; then
   openssl ca \
     -batch \
@@ -63,3 +69,5 @@ if [[ ! -f "$ca_certificate_revokation_list" ]]; then
     -out "$ca_certificate_revokation_list" \
     -passin file:"$ca_certificate_key_passphrase"
 fi
+
+chmod 644 "$ca_certificate_revokation_list"

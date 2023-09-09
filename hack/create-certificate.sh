@@ -34,6 +34,8 @@ cd "$ca_directory"
 
 mkdir -p "$certificate_directory"
 
+chmod 755 "$certificate_directory"
+
 if [[ -f "$certificate" ]]; then
   openssl ca \
     -batch \
@@ -48,6 +50,8 @@ if [[ -f "$certificate" ]]; then
     -gencrl \
     -out "$ca_certificate_revokation_list" \
     -passin file:"$ca_certificate_key_passphrase"
+
+  chmod 644 "$ca_certificate_revokation_list"
 
   rm -f "$certificate" "$certificate_key" "$certificate_signing_request"
 fi
@@ -78,3 +82,5 @@ if [[ ! -f "$certificate" ]]; then
     -out "$certificate" \
     -passin file:"$ca_certificate_key_passphrase"
 fi
+
+chmod 644 "$certificate"
