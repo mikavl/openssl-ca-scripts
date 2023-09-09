@@ -6,7 +6,7 @@ set -u
 . "$(dirname "$(realpath "$0")")/_helpers.sh"
 
 if [[ $# -lt 3 ]]; then
-  echo "Usage: $0 certificate_authority_common_name type common_name [key_bits] [days] [certificate_revokation_list_days]"
+  echo "Usage: $0 certificate_authority_common_name type common_name [key_bits] [days] [certificate_revokation_list_days] [group]"
   exit 1
 fi
 
@@ -26,6 +26,7 @@ certificate="$certificate_directory/$certificate_type-$certificate_common_name.p
 certificate_days="${5:-30}"
 certificate_key="$certificate_directory/$certificate_type-$certificate_common_name.key"
 certificate_key_bits="${4:-2048}"
+certificate_key_group="${7:-root}"
 certificate_signing_request="$certificate_directory/$certificate_type-$certificate_common_name.csr"
 
 umask 0077
@@ -59,6 +60,10 @@ fi
 if [[ ! -f "$certificate_key" ]]; then
   openssl genrsa -out "$certificate_key" "$certificate_key_bits"
 fi
+
+chmod 640 "$certificate_key"
+
+chown root:"$certificate_key_group" "$certificate_key"
 
 if [[ ! -f "$certificate_signing_request" ]]; then
   openssl req \
