@@ -1,0 +1,66 @@
+[ ca ]
+default_ca = ca_default
+
+[ ca_default ]
+dir              = .
+database         = $dir/index
+certificate      = $dir/ca.pem
+private_key      = $dir/ca.key
+crl_extensions   = crl_ext
+new_certs_dir    = certs
+policy           = policy_any
+rand_serial      = yes
+email_in_dn      = no
+default_md       = sha512
+email_in_dn      = no
+copy_extensions  = copy
+ext              = subjectAltName
+preserve         = no
+unique_subject   = no
+
+[ crl_ext ]
+authorityKeyIdentifier = keyid:always
+
+[ policy_any ]
+countryName            = optional
+stateOrProvinceName    = optional
+localityName           = optional
+organizationName       = optional
+organizationalUnitName = optional
+commonName             = supplied
+emailAddress           = optional
+
+[ req ]
+distinguished_name = req_distinguished_name
+string_mask        = utf8only
+default_md         = sha512
+x509_extensions    = v3_ca
+
+[ req_distinguished_name ]
+
+[ v3_ca ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always, issuer:always
+basicConstraints       = critical, CA:true, pathlen:0
+keyUsage               = critical, digitalSignature, cRLSign, keyCertSign
+
+[ client_cert ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid, issuer
+basicConstraints       = CA:false
+keyUsage               = critical, digitalSignature, nonRepudiation, keyEncipherment
+extendedKeyUsage       = clientAuth
+
+[ server_cert ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid, issuer:always
+basicConstraints       = CA:false
+keyUsage               = critical, digitalSignature, nonRepudiation, keyEncipherment
+extendedKeyUsage       = serverAuth
+
+[ clientserver_cert ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid, issuer:always
+basicConstraints       = CA:false
+keyUsage               = critical, digitalSignature, nonRepudiation, keyEncipherment
+extendedKeyUsage       = clientAuth, serverAuth
