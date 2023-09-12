@@ -6,7 +6,7 @@ set -u
 . "$(dirname "$(realpath "$0")")/_helpers.sh"
 
 if [[ $# -lt 3 ]]; then
-  echo "Usage: $0 certificate_authority_common_name type common_name [key_bits] [days] [certificate_revokation_list_days] [group]"
+  echo "Usage: $0 certificate_authority_common_name type common_name [days] [certificate_revokation_list_days]"
   exit 1
 fi
 
@@ -20,20 +20,19 @@ fi
 certificate_common_name="$3"
 
 ca_common_name="$1"
-ca_certificate_revokation_list_days="${6:-30}"
+ca_certificate_revokation_list_days="${5:-30}"
 ca_directory="$ca_common_name"
 certificate="$certificate_directory/$certificate_type-$certificate_common_name.pem"
-certificate_days="${5:-30}"
-certificate_key="$certificate_directory/$certificate_type-$certificate_common_name.key"
-certificate_key_bits="${4:-2048}"
-certificate_key_group="${7:-root}"
+certificate_days="${4:-30}"
 certificate_signing_request="$certificate_directory/$certificate_type-$certificate_common_name.csr"
 
 umask 0077
 
-cd "$ca_directory"
+mkdir -p "$ca_directory/$certificate_directory"
 
-mkdir -p "$certificate_directory"
+cp -f "$certificate_common_name.csr" "$ca_directory/$certificate_signing_request"
+
+cd "$ca_directory"
 
 chmod 755 "$certificate_directory"
 
@@ -54,26 +53,7 @@ if [[ -f "$certificate" ]]; then
 
   chmod 644 "$ca_certificate_revokation_list"
 
-  rm -f "$certificate" "$certificate_key" "$certificate_signing_request"
-fi
-
-if [[ ! -f "$certificate_key" ]]; then
-  openssl genrsa -out "$certificate_key" "$certificate_key_bits"
-fi
-
-chmod 640 "$certificate_key"
-
-chown root:"$certificate_key_group" "$certificate_key"
-
-if [[ ! -f "$certificate_signing_request" ]]; then
-  openssl req \
-    -addext "subjectAltName = DNS:$certificate_common_name" \
-    -batch \
-    -config "$openssl_config" \
-    -key "$certificate_key" \
-    -new \
-    -out "$certificate_signing_request" \
-    -subj "/CN=$certificate_common_name"
+  rm -f "$certificate"
 fi
 
 openssl ca \
