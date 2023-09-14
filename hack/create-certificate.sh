@@ -26,7 +26,7 @@ certificate="$certificate_directory/$certificate_type-$certificate_common_name.p
 certificate_days="${5:-30}"
 certificate_key="$certificate_directory/$certificate_type-$certificate_common_name.key"
 certificate_key_bits="${4:-2048}"
-certificate_key_group="${7:-root}"
+certificate_key_group="${7:-$(id --group --name)}"
 certificate_signing_request="$certificate_directory/$certificate_type-$certificate_common_name.csr"
 
 umask 0077
@@ -63,7 +63,7 @@ fi
 
 chmod 640 "$certificate_key"
 
-chown root:"$certificate_key_group" "$certificate_key"
+chown "$(id --user --name)":"$certificate_key_group" "$certificate_key"
 
 if [[ ! -f "$certificate_signing_request" ]]; then
   openssl req \

@@ -3,7 +3,9 @@ set -e
 set -o noglob
 set -u
 
-. "$(dirname "$(realpath "$0")")/_helpers.sh"
+script_path="$(dirname "$(realpath "$0")")"
+
+. "$script_path/_helpers.sh"
 
 if [[ $# -lt 1 ]]; then
   echo "Usage: $0 common_name [key_bits] [days] [certificate_revokation_list_days]"
@@ -23,7 +25,7 @@ mkdir -p "$ca_directory"
 chmod 755 "$ca_directory"
 
 if [[ ! -f "$ca_directory/$openssl_config" ]]; then
-  cp "$openssl_config.example" "$ca_directory/$openssl_config"
+  cp "$script_path/../$openssl_config.example" "$ca_directory/$openssl_config"
 fi
 
 cd "$ca_directory"
